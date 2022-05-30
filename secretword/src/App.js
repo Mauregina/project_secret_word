@@ -11,6 +11,7 @@ import {useState} from "react"
 import Start from './components/Start';
 import Game from './components/Game';
 import GameOver from './components/GameOver';
+import GameWin from './components/GameWin';
 
 function App() {
   const words = wordsList;
@@ -33,9 +34,14 @@ function App() {
     setStage(2);
   }
 
-  const handleGameOver = () => {
-    console.log('ACABARAM AS TENTATIVAS');
-    setStage(3);
+  const handleGameResult = (status) => {
+    if (status===1) {
+      setStage(3);
+      return;
+    } 
+
+    setScore(score+100);
+    setStage(4);
   }
 
   const restart = () => {
@@ -43,11 +49,16 @@ function App() {
     setScore(0);
   }
 
+  const keepPlaying = () => {
+    handleStart();
+  }
+
   return (
     <div className="App">
       {stage===1 && <Start handleStart={handleStart}/>}
-      {stage===2 && <Game category={category} word={word} score={score} handleGameOver={handleGameOver}/>}
-      {stage===3 && <GameOver score={score} restart={restart}/>}
+      {stage===2 && <Game category={category} word={word} score={score} handleGameResult={handleGameResult}/>}
+      {stage===3 && <GameOver score={score} word={word} restart={restart}/>}
+      {stage===4 && <GameWin score={score} keepPlaying={keepPlaying}/>}
     </div>
   );
 }

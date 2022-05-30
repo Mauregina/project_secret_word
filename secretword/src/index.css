@@ -13,10 +13,10 @@ body {
 }
 
 button {
-  background-color: #c0c0c0;
+  background-color: white;
   color: black;
   padding: 0 45px;
-  border: 2px solid #fff;
+  border: 2px solid black;
   border-radius: 25px;
   height: 50px;
   text-transform: uppercase;
@@ -27,7 +27,7 @@ button {
 }
 
 button:hover {
-  background: #778899;
+  background: #c0c0c0;
 }
 
 

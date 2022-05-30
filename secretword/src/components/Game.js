@@ -1,51 +1,68 @@
 import "./Game.css"
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
-const Game = ({category, word, score, handleGameOver}) => {
+const Game = ({category, word, score, handleGameResult}) => {
   const letters = word.split("");
   const lowerCasedLetters = letters.map(letter => letter.toLowerCase());
 
   const [letter, setLetter] = useState("");
   const [guessedLetters, setGuessedLetters] = useState([]);
-
-  console.log(lowerCasedLetters);
-
   const [attempt, setAttempt] = useState(3);
+
+  const letterInputRef = useRef(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const lowerCasedLetter = letter.toLowerCase();
 
+    const cleanInput = () => {
+        setLetter("");
+        letterInputRef.current.focus();
+    }
+
     if (guessedLetters.includes(lowerCasedLetter)) {
+        cleanInput();
         return;
     }
 
     if (lowerCasedLetters.includes(lowerCasedLetter)) {
-        setGuessedLetters((actualGuessedLetters) => [...actualGuessedLetters, lowerCasedLetter]);
-        checkWinConditions();
+        setGuessedLetters((actualGuessedLetters) => [
+            ...actualGuessedLetters,
+            lowerCasedLetter,
+          ]);
+          cleanInput();
+          return;
     }
-    else {
-        setAttempt(attempt-1);
-    }
-  }
 
-  const checkWinConditions = () => {
-
+    setAttempt(attempt-1);
+    cleanInput();
   }
 
   useEffect(() => {
     if (attempt <= 0) {
-        handleGameOver();
+        handleGameResult(1);
     } 
   }, [attempt]
+  );
+
+  useEffect(() => {
+    const uniqueLetters = [...new Set(lowerCasedLetters)];
+
+    if (uniqueLetters.length === guessedLetters.length) {
+        document.querySelector('#inputLetter').disabled = true;
+        document.querySelector('#btnPlay').disabled = true;
+        document.querySelector('#btnPlay').classList.add("disableButton");
+
+        setTimeout( function() {
+            handleGameResult(2);
+        }, 2000); 
+    }
+  }, [guessedLetters]
   );
   
   return (
     <div>
-        <p className="points">
-            <span>Points: {score}</span>
-        </p>
         <div className="title">
             <h1>Guess the word... </h1>
         </div>
@@ -61,12 +78,15 @@ const Game = ({category, word, score, handleGameOver}) => {
             )}
         </div>
         <div className="letterContainer">
-            <p>Type one word: </p>
+            <p>Type one letter: </p>
             <form onSubmit={handleSubmit}>
-                <input type="text" name="letter" maxLength={1} onChange={(e) => setLetter(e.target.value)}/>   
-                <button>Play</button> 
+                <input id="inputLetter" type="text" name="letter" maxLength={1} onChange={(e) => setLetter(e.target.value)} value={letter} required ref={letterInputRef}/>   
+                <button id="btnPlay">Play</button> 
             </form>
         </div>
+        <p className="points">
+            <span>Points: {score}</span>
+        </p>
     </div>
   )
 }
