@@ -7,6 +7,7 @@ const Game = ({category, word, score, handleGameResult}) => {
 
   const [letter, setLetter] = useState("");
   const [guessedLetters, setGuessedLetters] = useState([]);
+  const [wrongLetters, setWrongLetters] = useState([]);
   const [attempt, setAttempt] = useState(3);
 
   const letterInputRef = useRef(null);
@@ -21,11 +22,13 @@ const Game = ({category, word, score, handleGameResult}) => {
         letterInputRef.current.focus();
     }
 
-    if (guessedLetters.includes(lowerCasedLetter)) {
+    // Already informed letter
+    if ((guessedLetters.includes(lowerCasedLetter)) || (wrongLetters.includes(lowerCasedLetter))) {
         cleanInput();
         return;
     }
 
+    // Correct letter
     if (lowerCasedLetters.includes(lowerCasedLetter)) {
         setGuessedLetters((actualGuessedLetters) => [
             ...actualGuessedLetters,
@@ -35,8 +38,14 @@ const Game = ({category, word, score, handleGameResult}) => {
           return;
     }
 
+    // Wrong letter    
+    setWrongLetters((actualWrongLetters) => [
+        ...actualWrongLetters,
+        lowerCasedLetter,
+    ]);
     setAttempt(attempt-1);
     cleanInput();
+
   }
 
   useEffect(() => {
@@ -83,6 +92,12 @@ const Game = ({category, word, score, handleGameResult}) => {
                 <input id="inputLetter" type="text" name="letter" maxLength={1} onChange={(e) => setLetter(e.target.value)} value={letter} required ref={letterInputRef}/>   
                 <button id="btnPlay">Play</button> 
             </form>
+        </div>
+        <div className="wrongLettersContainer">
+            <p>Letters already used:</p>
+            {wrongLetters.map((letter, i) => (
+                <span key={i}>{letter}, </span>
+            ))}
         </div>
         <p className="points">
             <span>Points: {score}</span>
